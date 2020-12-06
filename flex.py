@@ -34,6 +34,14 @@ ADS_200_HZ = const(81)
 ADS_333_HZ = const(49)
 ADS_500_HZ = const(32)
 
+
+def parse_int_16(buf):
+    value = buf[0] + (buf[1] << 8)
+    if buf[1] & 0x80:
+        value -= 0xFFFF
+    return value
+
+
 class Flex:
     def __init__(self, i2c, address=0x12):
         self.i2c_device = I2CDevice(i2c, address)
@@ -43,7 +51,7 @@ class Flex:
         self.axes = self._read_device_type()
         if self.axes != 1:
             raise RuntimeError("Invalid device type.")
-        self.set_sample_rate(ADS_100_HZ)
+        self.set_sample_rate(ADS_10_HZ)
         print("OOK")
         self.poll()
 
@@ -52,8 +60,7 @@ class Flex:
         with self.i2c_device as i2c:
             i2c.readinto(self.buf, end=len(self.buf))
         if self.buf[0] == 0:
-            temp = int.from_bytes(self.buf[1:], "little")
-            self.sample = temp
+            self.sample = parse_int_16(self.buf[1:]) / 64.0
             return self.sample
 
 
@@ -111,6 +118,6 @@ def test():
     print(flex.axes)
     while True:
         print(flex.read_sample())
+        time.sleep(0.05)
 
-print("HELLO")
 test()
