@@ -14,7 +14,8 @@ The SmartGlove features the following sensors:
 - [PCA9557 I/O expansion](https://www.ti.com/product/PCA9557)
 - [Bend Labs Soft Flex sesor](https://www.bendlabs.com)
 
-## CircuitPython Srivers
+## CircuitPython Drivers
 
 - [BNO055](https://github.com/adafruit/Adafruit_CircuitPython_BNO055)
 - [VL53L0X](https://github.com/adafruit/Adafruit_CircuitPython_VL53L0X)
+- [SSD1306](https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_SSD1306)
