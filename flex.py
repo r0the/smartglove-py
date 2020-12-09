@@ -20,6 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+"""
+`flex` - Bend Labs Soft Flex sensor device driver
+
+Currently only supports one-axis sensor
+"""
+
 from adafruit_bus_device.i2c_device import I2CDevice
 from micropython import const
 import board
@@ -34,33 +40,24 @@ ADS_200_HZ = const(81)
 ADS_333_HZ = const(49)
 ADS_500_HZ = const(32)
 
-
-def parse_int_16(buf):
-    value = buf[0] + (buf[1] << 8)
-    if buf[1] & 0x80:
-        value -= 0xFFFF
-    return value
-
-
 class Flex:
     def __init__(self, i2c, address=0x12):
         self.i2c_device = I2CDevice(i2c, address)
         self.buf = bytearray(3)
         self.reset()
+        # Wait for device to  be reset
         time.sleep(0.05)
         self.axes = self._read_device_type()
         if self.axes != 1:
             raise RuntimeError("Invalid device type.")
         self.set_sample_rate(ADS_10_HZ)
-        print("OOK")
-        self.poll()
 
 
     def read_sample(self):
         with self.i2c_device as i2c:
             i2c.readinto(self.buf, end=len(self.buf))
         if self.buf[0] == 0:
-            self.sample = parse_int_16(self.buf[1:]) / 64.0
+            self.sample = self._parse_int_16(self.buf[1:]) / 64.0
             return self.sample
 
 
@@ -77,7 +74,7 @@ class Flex:
     def stop(self):
         if self.polling:
             self._set_poll_mode(False)
-        
+
 
     def set_address(self, address):
         self.buf[0] = 4
@@ -92,7 +89,14 @@ class Flex:
         self.buf[1] = sps & 0x00FF
         self.buf[2] = (sps & 0xFF00) >> 8
         with self.i2c_device as i2c:
-            i2c.write(self.buf)        
+            i2c.write(self.buf)
+
+
+    def _parse_int_16(self, buf):
+        value = buf[0] + (buf[1] << 8)
+        if buf[1] & 0x80:
+            value -= 0xFFFF
+        return value
 
 
     def _read_device_type(self):
@@ -110,14 +114,3 @@ class Flex:
         with self.i2c_device as i2c:
             i2c.write(self.buf)
         self.polling = enable
-
-
-def test():
-    i2c = board.I2C()
-    flex = Flex(i2c)
-    print(flex.axes)
-    while True:
-        print(flex.read_sample())
-        time.sleep(0.05)
-
-test()
