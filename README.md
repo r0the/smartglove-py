@@ -26,6 +26,7 @@ The SmartGlove features the following devices:
 - SSD1306-based dot matrix display
 - [PCA9557 I/O expansion](https://www.ti.com/product/PCA9557)
 - [Bend Labs Soft Flex sensor](https://www.bendlabs.com)
+- [24AA64 Serial EEPROM](https://www.microchip.com/wwwproducts/en/24AA64)
 
 ## I2C Devices
 
@@ -48,6 +49,7 @@ The software depends on the following libraries from the [Adafruit CiruitPython 
 
 - [libraries/helpers/bus_device](https://github.com/adafruit/Adafruit_CircuitPython_BusDevice)
 - [libraries/helpers/display_text](https://github.com/adafruit/Adafruit_CircuitPython_Display_Text)
+- [libraries/helpers/register](https://github.com/adafruit/Adafruit_CircuitPython_Register)
 - [libraries/drivers/bno055](https://github.com/adafruit/Adafruit_CircuitPython_BNO055)
 - [libraries/drivers/displayio_ssd1306](https://github.com/adafruit/Adafruit_CircuitPython_DisplayIO_SSD1306)
 - [libraries/drivers/neopixel](https://github.com/adafruit/Adafruit_CircuitPython_NeoPixel)
