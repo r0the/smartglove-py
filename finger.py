@@ -36,10 +36,10 @@ class Finger:
         except:
             print("No flex sensor at", flex_address, "detected")
             self.flex = None
-        self.button_mask = button_mask
+        self._button_mask = button_mask
         self.button_pressed = False
-        self.flex_value = 0
-        self.neopixel = neopixel.NeoPixel(
+        self._flex_value = 0
+        self._neopixel = neopixel.NeoPixel(
             neopixel_pin, NEOPIXEL_COUNT, brightness=NEOPIXEL_BRIGHTNESS, auto_write=False
         )
 
@@ -58,8 +58,8 @@ class Finger:
         k = NEOPIXEL_COUNT * abs(self.flex_value) / 120
         print(self.flex_value, k)
         for i in range(NEOPIXEL_COUNT):
-            self.neopixel[i] = (0, 0, 0) if k < i else (255, 0, 0)
-        self.neopixel.show()
+            self._neopixel[i] = (0, 0, 0) if k < i else (255, 0, 0)
+        self._neopixel.show()
 
 
 class Fingers:
@@ -68,22 +68,21 @@ class Fingers:
         self.middle = Finger(i2c, 0x13, 0x2, board.A1)
         self.ring = Finger(i2c, 0x14, 0x4, board.A2)
         self.little = Finger(i2c, 0x15, 0x8, board.A3)
-        self.fingers = [self.index, self.middle, self.ring, self.little]
-        self.buttons = pca9557.PCA9557(i2c, 0x19)
-        self.buttons.write_config(0xF0)
-        self.buttons.write_polarity(0xF0)
+        self._fingers = [self.index, self.middle, self.ring, self.little]
+        self._buttons = pca9557.PCA9557(i2c, 0x19)
+        self._buttons.write_config(0xF0)
+        self._buttons.write_polarity(0xF0)
 
 
     def __getitem__(self, index):
-        return self.fingers[index]
+        return self._fingers[index]
 
 
     def update(self):
-        state = (self.buttons.read_input() & 0xF0) >> 4
-        self.buttons.write_output(0xFF - state)
-        self.index.update(state)
-#        for finger in self.fingers:
-#            finger.update(state)
+        state = (self._buttons.read_input() & 0xF0) >> 4
+        self._buttons.write_output(0xFF - state)
+        for finger in self._fingers:
+            finger.update(state)
 
 
 i2c = board.I2C()
